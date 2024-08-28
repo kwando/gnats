@@ -2,6 +2,7 @@ import gleam/bit_array
 import gleam/erlang/process
 import gleam/io
 import gleam/option
+import gleam/string
 import gnats/internal
 import mug
 
@@ -25,8 +26,8 @@ fn start_client(host, port) {
 
 fn send(state: State, msg: internal.ClientMessage) {
   let msg_str = internal.client_msg_to_string(msg)
-  io.debug("<< " <> msg_str)
-  case mug.send(state.socket, bit_array.from_string(msg_str)) {
+  io.debug("<< " <> msg_str |> string.inspect)
+  case mug.send(state.socket, msg_str) {
     Ok(_) -> state
     Error(_) -> state
   }
@@ -64,7 +65,8 @@ fn loop(state: State) {
         Ok(#(msg, rest)) -> {
           handle_message(State(..state, buffer: rest), msg)
         }
-        Error(rest) -> State(..state, buffer: rest)
+        Error(internal.NeedsMoreData(rest)) -> State(..state, buffer: rest)
+        Error(internal.ProtocolError(error, ..)) -> panic as error
       }
     }
     _ -> state
