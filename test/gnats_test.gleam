@@ -1,7 +1,7 @@
 import gleam/option
 import gleeunit
 import gleeunit/should
-import gnats/internal.{Info, Msg, OK, Ping, parse}
+import gnats/internal.{Info, Msg, OK, Ping, client_msg_to_string, parse}
 import utils
 
 pub fn main() {
@@ -112,13 +112,13 @@ pub fn parse_hmsg_test() {
 }
 
 pub fn client_msg_to_string_test() {
-  internal.client_msg_to_string(internal.Unsubscribe("324", option.Some(5)))
+  client_msg_to_string(internal.Unsubscribe("324", option.Some(5)))
   |> should.equal(<<"UNSUB 324 5\r\n">>)
 
-  internal.client_msg_to_string(internal.Unsubscribe("324", option.None))
+  client_msg_to_string(internal.Unsubscribe("324", option.None))
   |> should.equal(<<"UNSUB 324\r\n">>)
 
-  internal.client_msg_to_string(internal.Publish(
+  client_msg_to_string(internal.Publish(
     subject: "FOO",
     headers: [#("Bar", "Baz")],
     payload: <<"Hello NATS!">>,
