@@ -12,3 +12,13 @@ pub fn take_lines_test() {
   |> should.be_ok
   |> should.equal(#([<<"AAA">>, <<"BBB">>], <<"CCC\r\n">>))
 }
+
+pub fn split_on_newline_test() {
+  utils.split_on_newline(<<"hello\r\nworld\r\n">>)
+  |> should.be_ok
+  |> should.equal(#(<<"hello">>, <<"world\r\n">>))
+
+  utils.split_on_newline(<<"hello">>)
+  |> should.be_error
+  |> should.equal(<<"hello">>)
+}
